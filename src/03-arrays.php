@@ -10,6 +10,15 @@
  */
 function repeatArrayValues(array $input)
 {
+  $output = [];
+  foreach ($input as $val){
+    $i = 0;
+    while ($i < $val){
+      $output[] = $val;
+      $i += 1;
+    }	
+  }
+  return $output;
 }
 
 /**
@@ -22,6 +31,13 @@ function repeatArrayValues(array $input)
  */
 function getUniqueValue(array $input)
 {
+  $remove_duplicate = array_unique ($input);
+
+  $diff = array_diff_key ($input, $remove_duplicate);
+
+  $unique = array_diff ($input, $diff);
+
+  return (empty ($unique)) ? 0 : min ($unique);
 }
 
 /**
@@ -50,4 +66,17 @@ function getUniqueValue(array $input)
  */
 function groupByTag(array $input)
 {
+  sort ($input);
+
+  foreach ($input as $keys) {
+    $tag_values = $keys['tags'];
+
+    foreach ($tag_values as $value) {
+        $output[$value][] = $keys['name'];
+    }
+}
+
+ksort ($output);
+
+return $output;
 }
