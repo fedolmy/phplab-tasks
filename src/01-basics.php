@@ -13,19 +13,19 @@
  */
 function getMinuteQuarter(int $minute)
 {
-  $res = ceil($minute / 15);
+    $res = ceil($minute / 15);
 
-  if ($res == 1) {
-    return "first";
-  } elseif ($res == 2) {
-    return "second";
-  } elseif ($res == 3) {
-    return "third";
-  } elseif ($res == 4 || $res == 0) {
-    return "fourth";
-  } else {
-    throw new InvalidArgumentException('Wrong number');
-  }
+    if ($res == 1) {
+        return "first";
+    } elseif ($res == 2) {
+        return "second";
+    } elseif ($res == 3) {
+        return "third";
+    } elseif ($res == 4 || $res == 0) {
+        return "fourth";
+    } else {
+        throw new InvalidArgumentException('Wrong number');
+    }
 }
 
 /**
@@ -41,11 +41,11 @@ function getMinuteQuarter(int $minute)
  */
 function isLeapYear(int $year)
 {
-  if ($year <= 1900) {
-    throw new InvalidArgumentException('Too lower number');
-  }
+    if ($year <= 1900) {
+        throw new InvalidArgumentException('Too lower number');
+    }
 
-  return $year % 4 ? false : true;
+    return $year % 4 ? false : true;
 }
 
 /**
@@ -61,14 +61,14 @@ function isLeapYear(int $year)
  */
 function isSumEqual(string $input)
 {
-  if (strlen($input) === 6) {
-    list($first_digits, $last_digits) = str_split($input, 3);;
+    if (strlen($input) === 6) {
+        list($first_digits, $last_digits) = str_split($input, 3);
 
-    $res_first = array_sum(str_split($first_digits));
-    $res_last =  array_sum(str_split($last_digits));
+        $res_first = array_sum(str_split($first_digits));
+        $res_last = array_sum(str_split($last_digits));
 
-    return $res_first == $res_last ? true : false;
-  }
+        return $res_first == $res_last ? true : false;
+    }
 
-  throw new InvalidArgumentException('Too many digits');
+    throw new InvalidArgumentException('Too many digits');
 }

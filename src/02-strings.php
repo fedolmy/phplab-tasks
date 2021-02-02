@@ -10,7 +10,7 @@
  */
 function snakeCaseToCamelCase(string $input)
 {
-  return lcfirst(str_replace('_', '', ucwords($input, '_')));
+    return lcfirst(str_replace('_', '', ucwords($input, '_')));
 }
 
 /**
@@ -23,17 +23,17 @@ function snakeCaseToCamelCase(string $input)
  */
 function mirrorMultibyteString(string $input)
 {
-  $revstr = '';
+    $revstr = '';
 
-  for ($i = mb_strlen($input); $i >= 0; $i--) {
-    $revstr .= mb_substr($input, $i, 1);
-  }
+    for ($i = mb_strlen($input); $i >= 0; $i--) {
+        $revstr .= mb_substr($input, $i, 1);
+    }
 
-  $words = explode(' ', $revstr);
-  $word_order = array_reverse($words);
-  $mirror_str = implode(' ', $word_order);
+    $words = explode(' ', $revstr);
+    $word_order = array_reverse($words);
+    $mirror_str = implode(' ', $word_order);
 
-  return $mirror_str;
+    return $mirror_str;
 }
 
 /**
@@ -52,13 +52,13 @@ function mirrorMultibyteString(string $input)
  */
 function getBrandName(string $noun)
 {
-  $upper = ucfirst($noun);
+    $upper = ucfirst($noun);
 
-  if ($noun[0] !== $noun[strlen($noun) - 1]) {
-    $output = "The $upper";
-  } else {
-    $output = "$upper" . substr($noun, 1);
-  }
+    if ($noun[0] !== $noun[strlen($noun) - 1]) {
+        $output = "The $upper";
+    } else {
+        $output = "$upper" . substr($noun, 1);
+    }
 
-  return $output;
+    return $output;
 }
