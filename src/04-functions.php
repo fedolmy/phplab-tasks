@@ -35,9 +35,13 @@ function sayHelloArgument($arg)
  */
 function sayHelloArgumentWrapper($arg)
 {
-    // put your code here
+    $type = gettype($arg);
 
-    return sayHelloArgument($arg);
+    if ($type == 'boolean' || $type == 'string' || is_numeric($arg)) {
+        return sayHelloArgument($arg);
+    }
+
+    throw new InvalidArgumentException($type . ' is not: number, string or bool');
 }
 
 /**
@@ -49,13 +53,13 @@ function sayHelloArgumentWrapper($arg)
 function countArguments()
 {
     return [
-        'argument_count'  => func_num_args(),
+        'argument_count' => func_num_args(),
         'argument_values' => func_get_args(),
     ];
 }
 
 /**
- * Fulfill a function countArgumentsWrapper so that it will call the original function (countArguments)
+ * Fullfill a function countArgumentsWrapper so that it will call the original function (countArguments)
  * but check if all arguments are strings and throws an InvalidArgumentException otherwise
  *
  * Create a PhpUnit test (CountArgumentsWrapperTest) which will check this behavior
@@ -67,7 +71,13 @@ function countArguments()
  * @return array
  * @throws InvalidArgumentException
  */
-function countArgumentsWrapper()
+function countArgumentsWrapper(...$arg)
 {
-    // put your code here
+    for ($i = 0; $i < count($arg); $i++) {
+        if (!is_string($arg[$i])) {
+            throw new InvalidArgumentException(gettype($arg[$i]) . ' is not a string');
+        }
+    }
+
+    return countArguments();
 }
