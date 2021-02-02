@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The $input variable contains text in snake case (i.e. hello_world or this_is_home_task)
  * Transform it into camel cased string and return (i.e. helloWorld or thisIsHomeTask)
@@ -9,10 +10,12 @@
  */
 function snakeCaseToCamelCase(string $input)
 {
-  if (strpos ($input, '_') === false){ return $input; }
+  if (strpos($input, '_') === false) {
+    return $input;
+  }
 
-  $uppercase = ucwords (str_replace ('_', ' ', $input));
-  $camelCase = lcfirst (str_replace (' ', '', $uppercase));
+  $uppercase = ucwords(str_replace('_', ' ', $input));
+  $camelCase = lcfirst(str_replace(' ', '', $uppercase));
 
   return $camelCase;
 }
@@ -29,13 +32,13 @@ function mirrorMultibyteString(string $input)
 {
   $revstr = '';
 
-    for ($i = mb_strlen ($input); $i>=0; $i--) {
-        $revstr .= mb_substr ($input, $i, 1);
-    }
-    
-  $words = explode (' ', $revstr);
-  $word_order = array_reverse ($words);
-  $mirror_str = implode (' ', $word_order);
+  for ($i = mb_strlen($input); $i >= 0; $i--) {
+    $revstr .= mb_substr($input, $i, 1);
+  }
+
+  $words = explode(' ', $revstr);
+  $word_order = array_reverse($words);
+  $mirror_str = implode(' ', $word_order);
 
   return $mirror_str;
 }
@@ -59,13 +62,13 @@ function getBrandName(string $noun)
   $upper = ucfirst($noun);
 
   $first_char = $noun[0];
-  $last_char = $noun[strlen($noun)-1];
+  $last_char = $noun[strlen($noun) - 1];
 
-  if ($first_char !== $last_char){
+  if ($first_char !== $last_char) {
     $output = "The $upper";
-  }else{
-    $second_part = substr ($noun, 1);
-    $output = "$upper"."$second_part";
+  } else {
+    $second_part = substr($noun, 1);
+    $output = "$upper" . "$second_part";
   }
 
   return $output;
