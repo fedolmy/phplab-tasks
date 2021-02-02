@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The $minute variable contains a number from 0 to 59 (i.e. 10 or 25 or 60 etc).
  * Determine in which quarter of an hour the number falls.
@@ -12,12 +13,19 @@
  */
 function getMinuteQuarter(int $minute)
 {
-  $res = ceil($minute/15);
-  if ($res == 1) { return "first"; }
-  elseif ($res == 2) { return "second"; }
-  elseif ($res == 3) { return "third"; }
-  elseif ($res == 4 || $res == 0) { return "fourth"; }
-  else { throw new InvalidArgumentException('Wrong number'); }
+  $res = ceil($minute / 15);
+
+  if ($res == 1) {
+    return "first";
+  } elseif ($res == 2) {
+    return "second";
+  } elseif ($res == 3) {
+    return "third";
+  } elseif ($res == 4 || $res == 0) {
+    return "fourth";
+  } else {
+    throw new InvalidArgumentException('Wrong number');
+  }
 }
 
 /**
@@ -33,10 +41,11 @@ function getMinuteQuarter(int $minute)
  */
 function isLeapYear(int $year)
 {
-  if ($year <= 1900){ throw new InvalidArgumentException('Too lower number'); }
-  $res = $year % 4;
-  if ($res == 0){ return true;}
-  return false;
+  if ($year <= 1900) {
+    throw new InvalidArgumentException('Too lower number');
+  }
+
+  return $year % 4 ? false : true;
 }
 
 /**
@@ -52,14 +61,14 @@ function isLeapYear(int $year)
  */
 function isSumEqual(string $input)
 {
-  if (strlen($input) == 6){
-    list ($first_digits, $last_digits) = str_split($input, 3);;
+  if (strlen($input) === 6) {
+    list($first_digits, $last_digits) = str_split($input, 3);;
 
-    $res_first = array_sum (str_split ($first_digits));
-    $res_last =  array_sum (str_split ($last_digits));
+    $res_first = array_sum(str_split($first_digits));
+    $res_last =  array_sum(str_split($last_digits));
 
-    if ($res_first == $res_last){ return true; }
-    return false;
+    return $res_first == $res_last ? true : false;
   }
-  else{ throw new InvalidArgumentException('Too many digits'); }
+
+  throw new InvalidArgumentException('Too many digits');
 }
