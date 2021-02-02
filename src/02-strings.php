@@ -10,14 +10,7 @@
  */
 function snakeCaseToCamelCase(string $input)
 {
-  if (strpos($input, '_') === false) {
-    return $input;
-  }
-
-  $uppercase = ucwords(str_replace('_', ' ', $input));
-  $camelCase = lcfirst(str_replace(' ', '', $uppercase));
-
-  return $camelCase;
+  return lcfirst(str_replace('_', '', ucwords($input, '_')));
 }
 
 /**
@@ -61,14 +54,10 @@ function getBrandName(string $noun)
 {
   $upper = ucfirst($noun);
 
-  $first_char = $noun[0];
-  $last_char = $noun[strlen($noun) - 1];
-
-  if ($first_char !== $last_char) {
+  if ($noun[0] !== $noun[strlen($noun) - 1]) {
     $output = "The $upper";
   } else {
-    $second_part = substr($noun, 1);
-    $output = "$upper" . "$second_part";
+    $output = "$upper" . substr($noun, 1);
   }
 
   return $output;
