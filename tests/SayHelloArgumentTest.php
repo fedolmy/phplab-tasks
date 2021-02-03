@@ -6,6 +6,8 @@ class SayHelloArgumentTest extends TestCase
 {
     /**
      * @dataProvider positiveDataProvider
+     * @param $arg
+     * @param $expected
      */
     public function testPositive($arg, $expected)
     {

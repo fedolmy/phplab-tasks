@@ -11,7 +11,7 @@ class CountArgumentsWrapperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        countArgumentsWrapper($arg);
+        countArgumentsWrapper(...$arg);
     }
 
     public function positiveDataProvider()

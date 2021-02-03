@@ -35,13 +35,11 @@ function sayHelloArgument($arg)
  */
 function sayHelloArgumentWrapper($arg)
 {
-    $type = gettype($arg);
-
-    if ($type == 'boolean' || $type == 'string' || is_numeric($arg)) {
+    if (is_bool($arg) || is_string($arg) || is_numeric($arg)) {
         return sayHelloArgument($arg);
     }
 
-    throw new InvalidArgumentException($type . ' is not: number, string or bool');
+    throw new InvalidArgumentException('Argument is not: number, string or bool');
 }
 
 /**
@@ -71,13 +69,17 @@ function countArguments()
  * @return array
  * @throws InvalidArgumentException
  */
-function countArgumentsWrapper(...$arg)
+function countArgumentsWrapper()
 {
-    for ($i = 0; $i < count($arg); $i++) {
-        if (!is_string($arg[$i])) {
-            throw new InvalidArgumentException(gettype($arg[$i]) . ' is not a string');
-        }
+    if (func_num_args() === 0) {
+        throw new InvalidArgumentException('No arguments passed');
     }
 
-    return countArguments();
+    $args = func_get_args();
+
+    foreach ($args as $arg) {
+        if (!is_string($arg)) {
+            throw new InvalidArgumentException('Argument is not a string');
+        }
+    }
 }
