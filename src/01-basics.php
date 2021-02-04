@@ -45,7 +45,7 @@ function isLeapYear(int $year)
         throw new InvalidArgumentException('Too lower number');
     }
 
-    return $year % 4 ? false : true;
+    return $year % 4 === 0;
 }
 
 /**
@@ -67,7 +67,7 @@ function isSumEqual(string $input)
         $res_first = array_sum(str_split($first_digits));
         $res_last = array_sum(str_split($last_digits));
 
-        return $res_first == $res_last ? true : false;
+        return $res_first == $res_last;
     }
 
     throw new InvalidArgumentException('Too many digits');
