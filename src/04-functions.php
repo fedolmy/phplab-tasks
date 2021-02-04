@@ -75,9 +75,7 @@ function countArgumentsWrapper()
         throw new InvalidArgumentException('No arguments passed');
     }
 
-    $args = func_get_args();
-
-    foreach ($args as $arg) {
+    foreach (func_get_args() as $arg) {
         if (!is_string($arg)) {
             throw new InvalidArgumentException('Argument is not a string');
         }
