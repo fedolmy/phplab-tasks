@@ -80,4 +80,5 @@ function countArgumentsWrapper()
             throw new InvalidArgumentException('Argument is not a string');
         }
     }
+    return countArguments(...$arg);
 }
