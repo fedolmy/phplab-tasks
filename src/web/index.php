@@ -3,12 +3,21 @@ require_once './functions.php';
 
 $airports = require './airports.php';
 
+define('AIRPORTS_PER_PAGE', 5);
+
 // Filtering
 /**
  * Here you need to check $_GET request if it has any filtering
  * and apply filtering by First Airport Name Letter and/or Airport State
  * (see Filtering tasks 1 and 2 below)
  */
+
+if (isset($_GET['filter_by_first_letter'])) {
+    $airports = filterByLetter($airports, $_GET['filter_by_first_letter']);
+}
+if (isset($_GET['filter_by_state'])) {
+    $airports = filterByState($airports, $_GET['filter_by_state']);
+}
 
 // Sorting
 /**
@@ -17,12 +26,22 @@ $airports = require './airports.php';
  * (see Sorting task below)
  */
 
+if (isset($_GET['sort'])) {
+    usort($airports, sortByKeyValue($_GET['sort']));
+}
+
 // Pagination
 /**
  * Here you need to check $_GET request if it has pagination key
  * and apply pagination logic
  * (see Pagination task below)
  */
+
+$total = intval(((count($airports) - 1) / AIRPORTS_PER_PAGE) + 1);
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+if ($page > $total) {
+    $page = $_GET['page'] = $total;
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -52,9 +71,9 @@ $airports = require './airports.php';
     <div class="alert alert-dark">
         Filter by first letter:
 
-        <?php foreach (getUniqueFirstLetters(require './airports.php') as $letter): ?>
-            <a href="#"><?= $letter ?></a>
-        <?php endforeach; ?>
+        <?php foreach (getUniqueFirstLetters($airports) as $letter): ?>
+            <a href="<?=setUrl('filter_by_first_letter', $letter)?>"><?=$letter?></a>
+        <?php endforeach;?>
 
         <a href="/" class="float-right">Reset all filters</a>
     </div>
@@ -72,10 +91,10 @@ $airports = require './airports.php';
     <table class="table">
         <thead>
         <tr>
-            <th scope="col"><a href="#">Name</a></th>
-            <th scope="col"><a href="#">Code</a></th>
-            <th scope="col"><a href="#">State</a></th>
-            <th scope="col"><a href="#">City</a></th>
+            <th scope="col"><a href="<?=setUrl('sort', 'name')?>">Name</a></th>
+            <th scope="col"><a href="<?=setUrl('sort', 'code')?>">Code</a></th>
+            <th scope="col"><a href="<?=setUrl('sort', 'state')?>">State</a></th>
+            <th scope="col"><a href="<?=setUrl('sort', 'city')?>">City</a></th>
             <th scope="col">Address</th>
             <th scope="col">Timezone</th>
         </tr>
@@ -91,16 +110,18 @@ $airports = require './airports.php';
              - when you apply filter_by_state, than filter_by_first_letter (see Filtering task #1) is not reset
                i.e. if you have filter_by_first_letter set you can additionally use filter_by_state
         -->
+        <?php $start = ($page * AIRPORTS_PER_PAGE) - AIRPORTS_PER_PAGE;?>
+        <?php $airports = array_slice($airports, $start, AIRPORTS_PER_PAGE);?>
         <?php foreach ($airports as $airport): ?>
         <tr>
-            <td><?= $airport['name'] ?></td>
-            <td><?= $airport['code'] ?></td>
-            <td><a href="#"><?= $airport['state'] ?></a></td>
-            <td><?= $airport['city'] ?></td>
-            <td><?= $airport['address'] ?></td>
-            <td><?= $airport['timezone'] ?></td>
+            <td><?=$airport['name']?></td>
+            <td><?=$airport['code']?></td>
+            <td><a href="<?=setUrl('filter_by_state', $airport['state'])?>"><?=$airport['state']?></a></td>
+            <td><?=$airport['city']?></td>
+            <td><?=$airport['address']?></td>
+            <td><?=$airport['timezone']?></td>
         </tr>
-        <?php endforeach; ?>
+        <?php endforeach;?>
         </tbody>
     </table>
 
@@ -115,9 +136,33 @@ $airports = require './airports.php';
     -->
     <nav aria-label="Navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+
+            <?php if ($page > 2): ?>
+                <li class='page-item start'><a class='page-link' href="<?=setUrl('page', 1)?>">1</a></li>
+            <?php endif;?>
+
+            <?php if ($page > 3 && $total > 4): ?>
+                <li class='page-item prev'><a class='page-link' href="<?=setUrl('page', ($page - 1))?> "><</a>
+            <?php endif;?>
+
+            <?php if ($page - 1 > 0): ?>
+                <li class='page-item'><a class='page-link' href="<?=setUrl('page', ($page - 1))?> "><?=($page - 1)?></a>
+            <?php endif;?>
+
+                <li class='page-item active'><a class='page-link' href="<?=setUrl('page', $page)?> "><?=($page)?></a>
+
+            <?php if ($page + 1 <= $total): ?>
+                <li class='page-item'><a class='page-link' href="<?=setUrl('page', ($page + 1))?>  "><?=($page + 1)?></a>
+            <?php endif;?>
+
+            <?php if ($page < $total - 2 && $total > 4): ?>
+                <li class='page-item next'><a class='page-link' href="<?=setUrl('page', ($page + 1))?> ">></a>
+            <?php endif;?>
+
+            <?php if ($page < $total - 1): ?>
+                <li class='page-item end'><a class='page-link' href="<?=setUrl('page', $total)?>"><?=$total?></a></li>
+            <?php endif;?>
+
         </ul>
     </nav>
 
