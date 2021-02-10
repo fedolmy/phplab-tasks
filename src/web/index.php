@@ -38,7 +38,7 @@ if (isset($_GET['sort'])) {
  */
 
 $total = intval(((count($airports) - 1) / AIRPORTS_PER_PAGE) + 1);
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$page = $_GET['page'] ?? 1;
 if ($page > $total) {
     $page = $_GET['page'] = $total;
 }
@@ -72,7 +72,7 @@ if ($page > $total) {
         Filter by first letter:
 
         <?php foreach (getUniqueFirstLetters($airports) as $letter): ?>
-            <a href="<?=setUrl('filter_by_first_letter', $letter)?>"><?=$letter?></a>
+            <a href="/?<?= http_build_query(array_merge($_GET, ['filter_by_first_letter' => $letter, 'page' => 1])) ?>"><?= $letter ?></a>
         <?php endforeach;?>
 
         <a href="/" class="float-right">Reset all filters</a>
@@ -91,10 +91,10 @@ if ($page > $total) {
     <table class="table">
         <thead>
         <tr>
-            <th scope="col"><a href="<?=setUrl('sort', 'name')?>">Name</a></th>
-            <th scope="col"><a href="<?=setUrl('sort', 'code')?>">Code</a></th>
-            <th scope="col"><a href="<?=setUrl('sort', 'state')?>">State</a></th>
-            <th scope="col"><a href="<?=setUrl('sort', 'city')?>">City</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'name'])) ?>">Name</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'code'])) ?>">Code</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'state'])) ?>">State</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'city'])) ?>">City</a></th>
             <th scope="col">Address</th>
             <th scope="col">Timezone</th>
         </tr>
@@ -114,12 +114,12 @@ if ($page > $total) {
         <?php $airports = array_slice($airports, $start, AIRPORTS_PER_PAGE);?>
         <?php foreach ($airports as $airport): ?>
         <tr>
-            <td><?=$airport['name']?></td>
-            <td><?=$airport['code']?></td>
-            <td><a href="<?=setUrl('filter_by_state', $airport['state'])?>"><?=$airport['state']?></a></td>
-            <td><?=$airport['city']?></td>
-            <td><?=$airport['address']?></td>
-            <td><?=$airport['timezone']?></td>
+            <td><?= $airport['name'] ?></td>
+            <td><?= $airport['code'] ?></td>
+            <td><a href="/?<?= http_build_query(array_merge($_GET, ['filter_by_state' => $airport['state'], 'page' => 1])) ?>"><?= $airport['state'] ?></a></td>
+            <td><?= $airport['city'] ?></td>
+            <td><?= $airport['address'] ?></td>
+            <td><?= $airport['timezone'] ?></td>
         </tr>
         <?php endforeach;?>
         </tbody>
@@ -136,33 +136,25 @@ if ($page > $total) {
     -->
     <nav aria-label="Navigation">
         <ul class="pagination justify-content-center">
-
             <?php if ($page > 2): ?>
-                <li class='page-item start'><a class='page-link' href="<?=setUrl('page', 1)?>">1</a></li>
+                <li class='page-item start'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>">1</a></li>
             <?php endif;?>
-
             <?php if ($page > 3 && $total > 4): ?>
-                <li class='page-item prev'><a class='page-link' href="<?=setUrl('page', ($page - 1))?> "><</a>
+                <li class='page-item prev'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page - 1)])) ?>"><</a>
             <?php endif;?>
-
             <?php if ($page - 1 > 0): ?>
-                <li class='page-item'><a class='page-link' href="<?=setUrl('page', ($page - 1))?> "><?=($page - 1)?></a>
+                <li class='page-item'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page - 1)])) ?>"><?= ($page - 1) ?></a>
             <?php endif;?>
-
-                <li class='page-item active'><a class='page-link' href="<?=setUrl('page', $page)?> "><?=($page)?></a>
-
+                <li class='page-item active'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => $page])) ?>"><?= ($page) ?></a>
             <?php if ($page + 1 <= $total): ?>
-                <li class='page-item'><a class='page-link' href="<?=setUrl('page', ($page + 1))?>  "><?=($page + 1)?></a>
+                <li class='page-item'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page + 1)])) ?>"><?= ($page + 1) ?></a>
             <?php endif;?>
-
             <?php if ($page < $total - 2 && $total > 4): ?>
-                <li class='page-item next'><a class='page-link' href="<?=setUrl('page', ($page + 1))?> ">></a>
+                <li class='page-item next'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page + 1)])) ?>">></a>
             <?php endif;?>
-
             <?php if ($page < $total - 1): ?>
-                <li class='page-item end'><a class='page-link' href="<?=setUrl('page', $total)?>"><?=$total?></a></li>
+                <li class='page-item end'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => $total])) ?>"><?= $total ?></a></li>
             <?php endif;?>
-
         </ul>
     </nav>
 

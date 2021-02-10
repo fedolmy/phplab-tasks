@@ -11,14 +11,10 @@
  */
 function getUniqueFirstLetters(array $airports): array
 {
-    $first_letters = [];
-
-    foreach ($airports as $v) {
-        if (!in_array($v['name'][0], $first_letters)) {
-            array_push($first_letters, $v['name'][0]);
-        }
-
+    foreach ($airports as $airport) {
+        $first_letters[] = $airport["name"][0];
     }
+    $first_letters = array_unique($first_letters);
     sort($first_letters);
 
     return $first_letters;
@@ -57,20 +53,4 @@ function sortByKeyValue(string $key): object
     return function ($a, $b) use ($key) {
         return strcmp($a[$key], $b[$key]);
     };
-}
-
-/**
- * @param  string  $filter_key
- * @param  string  $filter_value
- * @return string
- */
-function setUrl(string $filter_key, string $filter_value): string
-{
-    $get = $_GET;
-    $get["$filter_key"] = $filter_value;
-    if ((($filter_key == 'filter_by_first_letter') || ($filter_key == 'filter_by_state'))) {
-        $get["page"] = 1;
-    }
-
-    return ("/?" . http_build_query($get));
 }
