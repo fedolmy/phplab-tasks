@@ -87,7 +87,7 @@ class Calculator
      * @return $this
      * @throws \InvalidArgumentException
      */
-    public function compute($command, float ...$args)
+    public function compute($command, float...$args)
     {
         $this->intents[] = [$this->getCommand($command), $args];
 
@@ -127,6 +127,7 @@ class Calculator
     public function undo()
     {
         // TODO implement undo logic here
+        array_pop($this->intents);
 
         return $this;
     }
@@ -139,6 +140,8 @@ class Calculator
     public function replay()
     {
         // TODO implement replay logic here
+
+        $this->intents[] = end($this->intents);
 
         return $this;
     }
