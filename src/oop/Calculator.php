@@ -146,12 +146,14 @@ class Calculator
     {
         // TODO implement replay logic here
 
-        if (isset($this->intents[0]['undo'])) {
-            $this->undo();
-        } else {
-            $this->intents[] = end($this->intents);
+        if (count($this->intents) > 0) {
+            if (isset($this->intents[0]['undo'])) {
+                $this->undo();
+            } else {
+                $this->intents[] = end($this->intents);
+            }
         }
-        
+
         return $this;
     }
 
