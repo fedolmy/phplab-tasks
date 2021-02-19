@@ -2,13 +2,29 @@
 /**
  * Connect to DB
  */
-
+require_once './pdo_ini.php';
 /**
  * SELECT the list of unique first letters using https://www.w3resource.com/mysql/string-functions/mysql-left-function.php
  * and https://www.w3resource.com/sql/select-statement/queries-with-distinct.php
  * and set the result to $uniqueFirstLetters variable
  */
-$uniqueFirstLetters = ['A', 'B', 'C'];
+define('AIRPORTS_PER_PAGE', 5);
+$uniqueFirstLetters = [];
+$sql_letter = <<<'SQL'
+    SELECT DISTINCT LEFT(`name`, 1) AS `first letter`
+    FROM `airports`
+    ORDER BY `first letter`
+SQL;
+foreach ($pdo->query($sql_letter) as $letter) {
+    $uniqueFirstLetters[] = $letter['first letter'];
+}
+
+$sql = <<<'SQL'
+    SELECT a.`name`, a.`code`, s.`name` AS `state_name`, c.`name` AS `city_name`, `address`, `timezone`
+    FROM `airports` a
+    JOIN `states` s ON s.`id` = a.`state_id`
+    JOIN `cities` c ON c.`id` = a.`city_id`
+SQL;
 
 // Filtering
 /**
@@ -20,6 +36,23 @@ $uniqueFirstLetters = ['A', 'B', 'C'];
  * For filtering by state you will need to JOIN states table and check if states.name = A
  * where A - requested filter value
  */
+if (isset($_GET['filter_by_first_letter']) || isset($_GET['filter_by_state'])) {
+    $sql .= " WHERE ";
+}
+if (isset($_GET['filter_by_first_letter'])) {
+    $sql .= "a.`name` LIKE " . "'" . $_GET['filter_by_first_letter'] . "%'";
+}
+if (isset($_GET['filter_by_state'])) {
+    if (isset($_GET['filter_by_first_letter'])) {
+        $sql .= " AND ";
+    }
+    $sql .= "s.`name` = '" . $_GET['filter_by_state'] . "'";
+}
+
+$sql_count = str_replace("a.`name`, a.`code`, s.`name` AS `state_name`, c.`name` AS `city_name`, `address`, `timezone`", "COUNT(*) AS total", $sql);
+$sth_count = $pdo->query($sql_count);
+$sth_count->execute();
+$total_value = intval($sth_count->fetch()['total']);
 
 // Sorting
 /**
@@ -30,7 +63,9 @@ $uniqueFirstLetters = ['A', 'B', 'C'];
  * For sorting use ORDER BY A
  * where A - requested filter value
  */
-
+if (isset($_GET['sort'])) {
+    $sql .= ' ORDER BY `' . $_GET['sort'] . '` ASC';
+}
 // Pagination
 /**
  * Here you need to check $_GET request if it has pagination key
@@ -40,6 +75,13 @@ $uniqueFirstLetters = ['A', 'B', 'C'];
  * For pagination use LIMIT
  * To get the number of all airports matched by filter use COUNT(*) in the SELECT statement with all filters applied
  */
+$page = $_GET['page'] ?? 1;
+$start = ($page * AIRPORTS_PER_PAGE) - AIRPORTS_PER_PAGE;
+$sql .= " limit $start , " . AIRPORTS_PER_PAGE;
+$total = intval((($total_value - 1) / AIRPORTS_PER_PAGE) + 1);
+if ($page > $total) {
+    $total = $page;
+}
 
 /**
  * Build a SELECT query to DB with all filters / sorting / pagination
@@ -48,6 +90,10 @@ $uniqueFirstLetters = ['A', 'B', 'C'];
  * For city_name and state_name fields you can use alias https://www.mysqltutorial.org/mysql-alias/
  */
 $airports = [];
+$sth = $pdo->prepare($sql);
+$sth->setFetchMode(\PDO::FETCH_ASSOC);
+$res = $sth->execute();
+$airports = $sth->fetchAll();
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,8 +124,8 @@ $airports = [];
         Filter by first letter:
 
         <?php foreach ($uniqueFirstLetters as $letter): ?>
-            <a href="#"><?= $letter ?></a>
-        <?php endforeach; ?>
+            <a href="/?<?= http_build_query(array_merge($_GET, ['filter_by_first_letter' => $letter, 'page' => 1])) ?>"><?= $letter ?></a>
+        <?php endforeach;?>
 
         <a href="/" class="float-right">Reset all filters</a>
     </div>
@@ -97,10 +143,10 @@ $airports = [];
     <table class="table">
         <thead>
         <tr>
-            <th scope="col"><a href="#">Name</a></th>
-            <th scope="col"><a href="#">Code</a></th>
-            <th scope="col"><a href="#">State</a></th>
-            <th scope="col"><a href="#">City</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'name'])) ?>">Name</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'code'])) ?>">Code</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'state_name'])) ?>">State</a></th>
+            <th scope="col"><a href="/?<?= http_build_query(array_merge($_GET, ['sort' => 'city_name'])) ?>">City</a></th>
             <th scope="col">Address</th>
             <th scope="col">Timezone</th>
         </tr>
@@ -118,14 +164,14 @@ $airports = [];
         -->
         <?php foreach ($airports as $airport): ?>
         <tr>
-            <td><?= $airport['name'] ?></td>
-            <td><?= $airport['code'] ?></td>
-            <td><a href="#"><?= $airport['state_name'] ?></a></td>
-            <td><?= $airport['city_name'] ?></td>
-            <td><?= $airport['address'] ?></td>
-            <td><?= $airport['timezone'] ?></td>
+            <td><?=$airport['name']?></td>
+            <td><?=$airport['code']?></td>
+            <td><a href="/?<?= http_build_query(array_merge($_GET, ['filter_by_state' => $airport['state_name'], 'page' => 1])) ?>"><?=$airport['state_name']?></a></td>
+            <td><?=$airport['city_name']?></td>
+            <td><?=$airport['address']?></td>
+            <td><?=$airport['timezone']?></td>
         </tr>
-        <?php endforeach; ?>
+        <?php endforeach;?>
         </tbody>
     </table>
 
@@ -140,9 +186,25 @@ $airports = [];
     -->
     <nav aria-label="Navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <?php if ($page > 2): ?>
+                <li class='page-item start'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>">1</a></li>
+            <?php endif;?>
+            <?php if ($page > 3 && $total > 4): ?>
+                <li class='page-item prev'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page - 1)])) ?>"><</a>
+            <?php endif;?>
+            <?php if ($page - 1 > 0): ?>
+                <li class='page-item'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page - 1)])) ?>"><?= ($page - 1) ?></a>
+            <?php endif;?>
+                <li class='page-item active'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => $page])) ?>"><?= ($page) ?></a>
+            <?php if ($page + 1 <= $total): ?>
+                <li class='page-item'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page + 1)])) ?>"><?= ($page + 1) ?></a>
+            <?php endif;?>
+            <?php if ($page < $total - 2 && $total > 4): ?>
+                <li class='page-item next'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => ($page + 1)])) ?>">></a>
+            <?php endif;?>
+            <?php if ($page < $total - 1): ?>
+                <li class='page-item end'><a class='page-link' href="/?<?= http_build_query(array_merge($_GET, ['page' => $total])) ?>"><?= $total ?></a></li>
+            <?php endif;?>
         </ul>
     </nav>
 
